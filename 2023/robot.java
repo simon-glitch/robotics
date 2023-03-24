@@ -119,11 +119,6 @@ public class Robot extends TimedRobot {
    * @param doLog: whether we should post the limelight's values to Smart Dashboard; doLog = true causes values to be logged
    */
   private void readFromLimelight(boolean doLog){
-    /* Simon's code to display entire network table
-      | NetworkTableInstance tabinst = NetworkTableInstance.getDefault();
-      | SmartDashboard.setNetworkTableInstance(tabinst);
-    */
-    
     table = NetworkTableInstance.getDefault().getTable("limelight-bacon");
     tx = table.getEntry("tx");
     ty = table.getEntry("ty");
@@ -132,25 +127,17 @@ public class Robot extends TimedRobot {
     llx = tx.getDouble(0.0);
     lly = ty.getDouble(0.0);
     lla = ta.getDouble(0.0);
-    // post from limelight to smart dashboard periodically
-    SmartDashboard.putNumber("llx", llx);
-    SmartDashboard.putNumber("lly", lly);
-    SmartDashboard.putNumber("lla (area)", lla);
+    
+    if(doLog){
+      // post from limelight to smart dashboard periodically
+      SmartDashboard.putNumber("llx", llx);
+      SmartDashboard.putNumber("lly", lly);
+      SmartDashboard.putNumber("lla (area)", lla);
+    }
   }
 
   
   private HeightGuesser heightGuesser = new HeightGuesser();
-  /*
-    private double currentEncoderStartValueForVisionBasedRuler = 0;
-    private double currentEncoder__EndValueForVisionBasedRuler = 0;
-    private double currentTy_____StartValueForVisionBasedRuler = 0;
-    private double currentTy_______EndValueForVisionBasedRuler = 0;
-    private double                    minimumDistanceForMeasurement = 20; // half a foot
-    private double previousEcnoderVisionBasedRulerHeightMeasurement = 0 ;
-    private boolean heightGuesser.isDoneTravelling = true;
-  */
-  
-  
   
   // count revolutions while spinning
   private static int llTurnFrameWavelength = 10;
@@ -158,14 +145,6 @@ public class Robot extends TimedRobot {
   private boolean[] objectWasInView = new boolean[llTurnFrameWavelength];
   private boolean objectInView = false;
   private int objectSeenCount = 0;
-  
-  
-  /*
-  private double kg = 0.05;
-  private double ks = 0.05;
-  private double kv = 0.05;
-  private double ka = 0.0;
-  */
   
   private double driveGearRatio     = 10.71;
   private double wheelDiameter      = 6;
