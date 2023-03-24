@@ -52,30 +52,30 @@ public class Robot extends TimedRobot {
   private static double limelightHeight = ?? + Math.cos(limelightTilt * Math.PI/180) * ??;
   
   // motors and driveTrain (DifferentialDrive)
-  private CANSparkMax  leftFrontMotor = new CANSparkMax(1, MotorType.kBrushless);
-  private CANSparkMax   leftBackMotor = new CANSparkMax(2, MotorType.kBrushless);
-  private CANSparkMax rightFrontMotor = new CANSparkMax(3, MotorType.kBrushless);
-  private CANSparkMax  rightBackMotor = new CANSparkMax(4, MotorType.kBrushless);
+  private CANSparkMax motorFL = new CANSparkMax(1, MotorType.kBrushless);
+  private CANSparkMax motorBL = new CANSparkMax(2, MotorType.kBrushless);
+  private CANSparkMax motorFR = new CANSparkMax(3, MotorType.kBrushless);
+  private CANSparkMax motorBR = new CANSparkMax(4, MotorType.kBrushless);
   /**
    * armMotor is for arm rotation
    */
-  private CANSparkMax        armMotor = new CANSparkMax(5, MotorType.kBrushless);
-  private CANSparkMax  armExtendMotor = new CANSparkMax(6, MotorType.kBrushless);
+  private CANSparkMax     motorArmUp = new CANSparkMax(5, MotorType.kBrushless);
+  private CANSparkMax motorArmExtend = new CANSparkMax(6, MotorType.kBrushless);
   
-  private DifferentialDrive drive = new DifferentialDrive(leftFrontMotor, rightFrontMotor);
+  private DifferentialDrive drive = new DifferentialDrive(motorFL, motorFR);
 
   // encoders
   // encoder
-  private RelativeEncoder  leftFrontEncoder;
-  private RelativeEncoder rightFrontEncoder;
-  private RelativeEncoder        armEncoder;
+  private RelativeEncoder  encoderFL;
+  private RelativeEncoder encoderFR;
+  private RelativeEncoder        encoderArmUp;
   
   
   // == turn and power constants
-  private static double constantDeadband          = 0.1 ;
-  private static double constantMotorMax          = 0.5 ;
-  private static double constantProportionPower   = 1   ;
-  private static double constantProportionTurn    = 0.05;
+  private static double constantDeadband        = 0.1 ;
+  private static double constantMotorMax        = 0.5 ;
+  private static double constantProportionPower = 1   ;
+  private static double constantProportionTurn  = 0.05;
   private static double maxPower = constantProportionPower * constantMotorMax;
   private static double maxTurn  = constantProportionTurn  * constantMotorMax;
   
@@ -152,16 +152,17 @@ public class Robot extends TimedRobot {
   
   
   // all of our PIDs
-  private PID         drivePID = new PID();
-  private PID          turnPID = new PID();
-  private PID           armPID = new PID();
-  private PID     armExtendPID = new PID();
-  private PID     limelightPID = new PID();
+  private PID     drivePID = new PID();
+  private PID      turnPID = new PID();
+  private PID       armPID = new PID();
+  private PID armExtendPID = new PID();
+  private PID limelightPID = new PID();
+  
   private PID chargeStationPID = new PID();
-  private PID rampPID = chargeStationPID;
+  private PID   rampPID = chargeStationPID;
   
   private boolean button[12];
-
+  
   private void updateButtons() {
     for(int i = 0; i < button.length; i++){
       button[i]  = joy1.getRawButton(i) ;
@@ -181,27 +182,27 @@ public class Robot extends TimedRobot {
     
     
     // set the motors opposite for turning
-     leftFrontMotor.setInverted(true);
-    rightFrontMotor.setInverted(true);
+    motorFL.setInverted(true);
+    motorFR.setInverted(true);
     
     // have the back wheels follow the front wheels
-     leftBackMotor.follow(leftFrontMotor );
-    rightBackMotor.follow(rightFrontMotor);
+    motorBL.follow(motorFL );
+    motorBR.follow(motorFR);
     
     /**
      * In order to read encoder values an encoder object is created using the
      * getEncoder() method from an existing CANSparkMax object
      */
-     leftFrontEncoder =  leftFrontMotor.getEncoder();
-    rightFrontEncoder = rightFrontMotor.getEncoder();
+     encoderFL = motorFL.getEncoder();
+    encoderFR = motorFR.getEncoder();
     
     resetEncoders();
   }
   
   public void resetEncoders(){
     // reset them evil encoders
-    leftFrontEncoder.setPosition(0);
-    rightFrontEncoder.setPosition(0);
+    encoderFL.setPosition(0);
+    encoderFR.setPosition(0);
     
     drivePID.setup(
       0.05 ,
@@ -354,8 +355,8 @@ public class Robot extends TimedRobot {
      * 
      * GetPosition() returns the position of the encoder in units of revolutions
      */
-    SmartDashboard.putNumber("Le Enc Pos",  leftFrontEncoder.getPosition());
-    SmartDashboard.putNumber("Ri Enc Pos", rightFrontEncoder.getPosition());
+    SmartDashboard.putNumber("Le Enc Pos",  encoderFL.getPosition());
+    SmartDashboard.putNumber("Ri Enc Pos", encoderFR.getPosition());
 
     /**
      * 
@@ -364,8 +365,8 @@ public class Robot extends TimedRobot {
      * 
      * GetVelocity() returns the velocity of the encoder in units of RPM
      */
-    SmartDashboard.putNumber("Le Enc Vel",  leftFrontEncoder.getVelocity());
-    SmartDashboard.putNumber("Ri Enc Vel", rightFrontEncoder.getVelocity());
+    SmartDashboard.putNumber("Le Enc Vel",  encoderFL.getVelocity());
+    SmartDashboard.putNumber("Ri Enc Vel", encoderFR.getVelocity());
   
   }
   
@@ -413,7 +414,7 @@ public class Robot extends TimedRobot {
       turn = 0.9;
       
       // the number of encoder units per full revolution (of 360 deg)
-      SmartDashboard.putNumber("enc per spin", leftFrontEncoder.getPosition() / (objectSeenCount / 2));
+      SmartDashboard.putNumber("enc per spin", encoderFL.getPosition() / (objectSeenCount / 2));
       
     }
     
@@ -428,5 +429,4 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
   }
 }
-
 
